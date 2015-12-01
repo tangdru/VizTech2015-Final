@@ -84,7 +84,7 @@ function dataLoaded(err,country,metadata) {
      };
      })
      .entries(country);
-     console.log(countryCount);*/
+     console.log(countryCount);*/ds
 
     /*filterMedals = nestedData.map(function(eachCountry){ //pass this through a function that will filter by 'what i want'
             return eachCountry.values.filter(function(d) {
