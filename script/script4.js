@@ -1,4 +1,7 @@
 /**
+ * Created by tangdru on 12/3/15.
+ */
+/**
  * Created by tangdru on 11/24/15.
  */
 /*Start by setting up the canvas */
@@ -36,7 +39,7 @@ var lineGenerator = d3.svg.line()
     .y(function(d){ return scaleY(d.mdlcnt*2)})//scaleY(total value of year from country
     //.y(function(d){return scaleY(function(d)return d.yr;})
     // .rollup d3.sum(d, function(g){return g.values;});
-    .interpolate('basis');
+    .interpolate('bundle');
 
 
 
@@ -60,11 +63,6 @@ function dataLoaded(err,country,metadata) {
     console.log(nestedData);
 
 
-    //onclick('.btn')
-
-
-    //need to activate get set
-
 
     var filterPeace = nestedData.map(function(eachCountry){ //pass this through a function that will filter by 'what i want'
             return eachCountry.values.filter(function(d) {
@@ -73,40 +71,15 @@ function dataLoaded(err,country,metadata) {
     )
     console.log("Peace", filterPeace);
 
-    var hemisphere = nestedData.sort(function(d){
-
-    })
-    ;
-
-    //.sort()
-    //data(entries)
+//d3.selectAll('.btn-peace').on('click', function() {nestedData(filterPeace)
 
 
 
-    var series = plot.selectAll('.countries')
-        .data(d3.keys(nestedData))
-        .enter()
+    var series = plot
         .append('g')
-        .attr('class', 'country');
+        .attr('class','countries')
 
-    /*var seriesText = plot.selectAll('.seriesText')
-        .data(d3.keys(nestedData))
-        .enter()
-        .append('g')
-        .text(function(d){
-            return d.ctry})
-        .attr('class', 'seriesText');*/
-
-
-        //.attr('transform', function(d,i){return height/58, i
-            //don't forget the accessor functions have a second parameter "i",
-            // which is the index (starting from 0) of the element in the selection
-
-            //you can use the second parameter "i" to incrementally "shift"
-            // the <g.series> groups by a fixed amount
-        //});
-
-    var countryLines = series.selectAll('.line')
+    series.selectAll('country')
         .data(d3.keys(nestedData))
         .enter()
         .append('path')
@@ -115,20 +88,23 @@ function dataLoaded(err,country,metadata) {
             return lineGenerator(nestedData[d].values)})
         .attr('class','line')
         .attr('transform', function(d,i){
-            return 'translate('+(i*5000)/width+ ','+(i*-1400)/height+')';
+            return 'translate('+(i*5000)/width+ ','+(i*-4000)/height+')';
         });
 
-        series.selectAll('text')
-            .data(d3.keys(nestedData))
-            .enter()
-            .append('text')
-            .text(function(d){
-                return d.data.ctry});
+    series.selectAll('country')
+        .data(d3.keys(nestedData))
+        .enter()
+        .append('text')
+        .text(function(d){
+            return nestedData[d].key})
+        .attr('x', 0)
+        .attr('y', 480)
+        .attr('transform', function(d,i){
+            return 'translate('+(i*5000)/width+ ','+(i*-4000)/height+')';
+        })
 
+    ;
 
-
-
-    //plot.append('text').text(function(d){return country.ctry});
 }
 
 
