@@ -1,4 +1,10 @@
-
+/**
+ * Created by tangdru on 12/3/15.
+ */
+/**
+ * Created by tangdru on 11/24/15.
+ */
+/*Start by setting up the canvas */
 var margin = {t:50,r:50,b:50,l:50};
 var width = document.getElementById('plot').clientWidth - margin.r - margin.l,
     height = document.getElementById('plot').clientHeight - margin.t - margin.b;
@@ -23,7 +29,7 @@ var plot2 = d3.select('#plot-2')
 //Import
 queue()
     .defer(d3.csv,'data/nobelPrizes.csv',parse)
-    .defer(d3.csv,'data/metadataHemisphere.csv',parseMetadata)
+    .defer(d3.csv,'data/nobelPeace.csv',parse)
     .await(dataLoaded);
 
 
@@ -37,76 +43,80 @@ var lineGenerator = d3.svg.line()
 
 
 
-
 //Scales
-var scaleX = d3.scale.linear().domain([1880,2015]).range([0,width *.6]),
+var scaleX = d3.scale.linear().domain([1900,2015]).range([0,width*.6]),
     scaleY = d3.scale.linear().domain([0,100]).range([height,0]);
 
 
-function dataLoaded(err,country,metadata) {
+function dataLoaded(err,country,peace) {
 
     var nestedData = d3.nest()
         .key(function (d) {
-            return d.ctry
-        })
-
+            return d.ctry})
         .entries(country);
 
 
-    /*nestedData.forEach(function (each) {
-        count = d3.sum(each.values, function(d){return d.mdlcnt;})
-        each.total_count = count;
-    })*/
-
     console.log(nestedData);
 
+    plot.append('path')
+        .attr('class','line');
 
 
-    /*var filterPeace = nestedData.map(function(eachCountry){ //pass this through a function that will filter by 'what i want'
-            return eachCountry.values.filter(function(d) {
-                return d.prize == 'Peace';})
+    draw(country);
+
+
+    d3.selectAll('.btn-peace').on('click', function (d) {
+        var type = d3.select(this).attr('id');
+        if (type == 'country') {
+            draw(country);
+        } else {
+            draw(peace);
         }
-    )*/
-    var filterPeace = nestedData.map(function(eachCountry){
-            return {
-                key:eachCountry.key,
-                values:eachCountry.values.filter(function(d) {return d.prize == 'Peace';})
-            }
-        }
-    )
+    });
 
-    console.log("Peace", filterPeace);
+    console.log(country);
+    console.log(peace);
 
-    //d3.selectAll('.btn-peace').on('click', function(){ draw(filterPeace);})
+    function draw(dataSeries){
+        var series = plot
+            .append('g')
+            .attr('class','countries')
 
-    var series = plot
-        .append('g')
-        .attr('class','countries')
+        series.selectAll('country')
+            .data(d3.keys(nestedData))
+            .enter()
+            .append('path')
+            .attr('d', function(d){
+                //console.log(d);
+                return lineGenerator(nestedData[d].values)})
+            .attr('class','line')
+            .attr('transform', function(d,i){
+                return 'translate('+(i*5000)/width+ ','+(i*-4000)/height+')';
+            })
 
-    series.selectAll('country')
-        .data(d3.keys(nestedData))
-        .enter()
-        .append('path')
-        .attr('d', function(d){
-            //console.log(d);
-            return lineGenerator(nestedData[d].values)})
-        .attr('class','line')
-        .attr('transform', function(d,i){
-            return 'translate('+(i*5000)/width+ ','+(i*-4000)/height+')';
-        });
+        series.selectAll('country')
+            .data(d3.keys(nestedData))
+            .enter()
+            .append('text')
+            .text(function(d){
+                return nestedData[d].key})
+            .attr('x', 0)
+            .attr('y', 480)
+            .attr('transform', function(d,i){
+                return 'translate('+(i*5000)/width+ ','+(i*-4000)/height+')';
+            })
 
-    series.selectAll('country')
-        .data(d3.keys(nestedData))
-        .enter()
-        .append('text')
-        .text(function(d){
-            return nestedData[d].key})
-        .attr('x', 0)
-        .attr('y', 480)
-        .attr('transform', function(d,i){
-            return 'translate('+(i*5000)/width+ ','+(i*-4000)/height+')';
-        });
+        ;
+
+
+    }
+
+
+    //console.log(dataSeries);
+
+
 }
+
 
 
 

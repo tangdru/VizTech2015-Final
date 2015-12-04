@@ -54,19 +54,19 @@ function dataLoaded(err,country,metadata) {
 
 
     /*nestedData.forEach(function (each) {
-        count = d3.sum(each.values, function(d){return d.mdlcnt;})
-        each.total_count = count;
-    })*/
+     count = d3.sum(each.values, function(d){return d.mdlcnt;})
+     each.total_count = count;
+     })*/
 
     console.log(nestedData);
 
 
 
     /*var filterPeace = nestedData.map(function(eachCountry){ //pass this through a function that will filter by 'what i want'
-            return eachCountry.values.filter(function(d) {
-                return d.prize == 'Peace';})
-        }
-    )*/
+     return eachCountry.values.filter(function(d) {
+     return d.prize == 'Peace';})
+     }
+     )*/
     var filterPeace = nestedData.map(function(eachCountry){
             return {
                 key:eachCountry.key,
@@ -74,30 +74,24 @@ function dataLoaded(err,country,metadata) {
             }
         }
     )
-
     console.log("Peace", filterPeace);
 
-    //d3.selectAll('.btn-peace').on('click', function(){ draw(filterPeace);})
+    /*var nodes = plot.selectAll('.countryLines')
+        .datum(d3.keys(nestedData))
 
-    var series = plot
-        .append('g')
-        .attr('class','countries')
+    var nodesEnter = nodes.enter().append('g')
+        .attr('class','countryLines')
+        .attr('d', lineGenerator);
 
-    series.selectAll('country')
-        .data(d3.keys(nestedData))
-        .enter()
-        .append('path')
-        .attr('d', function(d){
-            //console.log(d);
-            return lineGenerator(nestedData[d].values)})
+    nodesEnter.append('path')
         .attr('class','line')
+        .attr('d', function(d){
+            return lineGenerator(nestedData[d].values)})
         .attr('transform', function(d,i){
             return 'translate('+(i*5000)/width+ ','+(i*-4000)/height+')';
-        });
+        })
 
-    series.selectAll('country')
-        .data(d3.keys(nestedData))
-        .enter()
+    nodesEnter.append('text')
         .append('text')
         .text(function(d){
             return nestedData[d].key})
@@ -105,9 +99,56 @@ function dataLoaded(err,country,metadata) {
         .attr('y', 480)
         .attr('transform', function(d,i){
             return 'translate('+(i*5000)/width+ ','+(i*-4000)/height+')';
-        });
-}
+        })
 
+    nodes.exit()
+        .remove();*/
+
+
+
+
+    plot.selectAll('.countryLines')
+        .datum(d3.keys(nestedData))
+        .transition()
+        .attr('d', lineGenerator);
+
+    var series = plot
+        .append('g')
+        .attr('class','countries')
+
+    var lines = series.selectAll('country')
+        .data(d3.keys(nestedData));
+    var linesEnter = lines.enter()
+        .append('path')
+        .attr('class','line')
+        .attr('d', function(d){
+            return lineGenerator(nestedData[d].values)})
+        .attr('transform', function(d,i){
+            return 'translate('+(i*5000)/width+ ','+(i*-4000)/height+')';
+        })
+
+    lines.exit()
+        .transition()
+        .remove();
+
+    var names = series.selectAll('names')
+        .data(d3.keys(nestedData));
+    var namesEnter = names.enter()
+        .append('text')
+        .text(function(d){
+            return nestedData[d].key})
+        .attr('x', 0)
+        .attr('y', 480)
+        .attr('transform', function(d,i){
+            return 'translate('+(i*5000)/width+ ','+(i*-4000)/height+')';
+        })
+
+    names.exit()
+        .transition()
+        .remove();
+
+
+}
 
 
 function parse(d){
