@@ -30,10 +30,13 @@ queue()
 //Generator
 var lineGenerator = d3.svg.line()
     .x(function(d){ return scaleX(d.yr)})
-    .y(function(d){ return scaleY(d.mdlcnt*2)})//scaleY(total value of year from country
+    .y(function(d){ return scaleY(d.mdlcnt*1.5)})
+    //.y(function(d){ return scaleY([d.mdlcnt]!='..'?+[d]:0)})
+
     //.y(function(d){return scaleY(function(d)return d.yr;})
     // .rollup d3.sum(d, function(g){return g.values;});
     .interpolate('bundle');
+
 
 
 
@@ -49,7 +52,6 @@ function dataLoaded(err,country,metadata) {
         .key(function (d) {
             return d.ctry
         })
-
         .entries(country);
 
 
@@ -142,6 +144,8 @@ function dataLoaded(err,country,metadata) {
         .attr('transform', function(d,i){
             return 'translate('+(i*5000)/width+ ','+(i*-4000)/height+')';
         })
+        .attachTooltip();
+
 
     names.exit()
         .transition()

@@ -105,15 +105,9 @@ function dataLoaded(err,country,peace) {
             .attr('transform', function(d,i){
                 return 'translate('+(i*5000)/width+ ','+(i*-4000)/height+')';
             })
-
         ;
 
-
     }
-
-
-    //console.log(dataSeries);
-
 
 }
 

@@ -33,7 +33,7 @@ queue()
 //Generator
 var lineGenerator = d3.svg.line()
     .x(function(d){ return scaleX(d.yr)})
-    .y(function(d){ return scaleY(d.mdlcnt*2)})//scaleY(total value of year from country
+    .y(function(d){ return scaleY(d.mdlcnt*1.25)})//scaleY(total value of year from country
     //.y(function(d){return scaleY(function(d)return d.yr;})
     // .rollup d3.sum(d, function(g){return g.values;});
     .interpolate('bundle');
@@ -44,7 +44,9 @@ var lineGenerator = d3.svg.line()
 var scaleX = d3.scale.linear().domain([1880,2015]).range([0,width *.6]),
     scaleY = d3.scale.linear().domain([0,100]).range([height,0]);
 
-
+var div = d3.select("body").append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0);
 
 function dataLoaded(err,country,peace) {
 
@@ -52,6 +54,7 @@ function dataLoaded(err,country,peace) {
         .key(function (d) {
             return d.ctry})
         .entries(country);
+    console.log(nestedData);
 
     nestedData.forEach(function (each) {
         count = d3.sum(each.values, function(d){return d.mdlcnt;})
@@ -66,8 +69,8 @@ function dataLoaded(err,country,peace) {
     console.log(nestedDataPeace);*/
 
 
-    //d3.selectAll('.btn-peace').on('click', function(){ draw(filterPeace);})
 
+    var value = "ugh-only shows my index number";
     var series = plot
         .data(country)
         .append('g')
@@ -82,8 +85,27 @@ function dataLoaded(err,country,peace) {
             return lineGenerator(nestedData[d].values)})
         .attr('class','line')
         .attr('transform', function(d,i){
-            return 'translate('+(i*5000)/width+ ','+(i*-4000)/height+')';
+            return 'translate('+(i*5000)/width+ ','+(i*-4500)/height+')';
+        })
+        //.call(attachTooltip);
+        .on('mouseover',function(d){
+            console.log(d)
+            //value = shoud updare from the map and puts the name ;
+            div.transition()
+                .duration(10)
+                .style("opacity",.9)
+
+            div.html('<p>' + value + '</p>')
+                .style("left", (d3.event.pageX) + "px")
+                .style("top", (d3.event.pageY - 30) + "px");
+        })
+        .on("mouseout", function(d) {
+            div.transition()
+                .duration(400)
+                .style("opacity", 0)
+
         });
+
 
     series.selectAll('country')
         .data(d3.keys(nestedData))
@@ -92,101 +114,64 @@ function dataLoaded(err,country,peace) {
         .text(function(d){
             return nestedData[d].key})
         .attr('x', 0)
-        .attr('y', 480)
+        .attr('y', 500)
         .attr('transform', function(d,i){
-            return 'translate('+(i*5000)/width+ ','+(i*-4000)/height+')';
+            return 'translate('+(i*5000)/width+ ','+(i*-4500)/height+')';
         });
 
-
-    var nestedDataPeace = d3.nest()
-        .key(function (d) {
-            return d.ctry})
-        .entries(peace);
-
-
-    var peace = plot2
-        .data(peace)
-        .append('g')
-        .attr('class','countries')
-
-    peace.selectAll('country')
-        .data(d3.keys(nestedDataPeace))
+    /*series.selectAll('country')
+        .data(d3.keys(nestedData))
         .enter()
-        .append('path')
-        .attr('d', function(d){
-            //console.log(d);
-            return lineGenerator(nestedDataPeace[d].values)})
-        .attr('class','line')
-        .attr('transform', function(d,i){
-            return 'translate('+(i*5000)/width+ ','+(i*-4000)/height+')';
-        });
-
-    peace.selectAll('country')
-        .data(d3.keys(nestedDataPeace))
-        .enter()
-        .append('text')
-        .text(function(d){
-            return nestedDataPeace[d].key})
-        .attr('x', 0)
-        .attr('y', 480)
+        .append('circle')
+        .attr('cx', function(d){
+            return nestedData[d].yr})
+        .attr('cy', function(d){
+            return nestedData[d].mdlcnt})
+        .attr('r', 8)
         .attr('transform', function(d,i){
             return 'translate('+(i*5000)/width+ ','+(i*-4000)/height+')';
         })
-
-    ;
-
+        .call(attachTooltip);*/
 
 
 }
 
-/*function dataLoaded(err,peace,metadata) {
-
-    var nestedData = d3.nest()
-        .key(function (d) {
-            return d.ctry})
-        .entries(peace);
-
-    nestedData.forEach(function (each) {
-        count = d3.sum(each.values, function(d){return d.mdlcnt;})
-        each.total_count = count;
-    })
-
-    console.log(nestedData);
+/*function attachTooltip(selection){
+    selection
+        .on('mouseenter',function(d){
+            var tooltip = d3.selectAll('.custom-tooltip>p>span');
+            console.log(tooltip)
 
 
-    //d3.selectAll('.btn-peace').on('click', function(){ draw(filterPeace);})
+            tooltip
+                .transition()
+                .style('opacity',1);
 
-    var series = plot
-        .append('g')
-        .attr('class','countries')
 
-    series.selectAll('country')
-        .data(d3.keys(nestedData))
-        .enter()
-        .append('path')
-        .attr('d', function(d){
-            //console.log(d);
-            return lineGenerator(nestedData[d].values)})
-        .attr('class','line')
-        .attr('transform', function(d,i){
-            return 'translate('+(i*5000)/width+ ','+(i*-4000)/height+')';
-        });
+            console.log(d3.select(tooltip[0][0]))
+            d3.select(tooltip[0][0]).html(d.prize);
+            tooltip.select('#Name').html(d.nameFirst);
 
-    series.selectAll('country')
-        .data(d3.keys(nestedData))
-        .enter()
-        .append('text')
-        .text(function(d){
-            return nestedData[d].key})
-        .attr('x', 0)
-        .attr('y', 480)
-        .attr('transform', function(d,i){
-            return 'translate('+(i*5000)/width+ ','+(i*-4000)/height+')';
         })
 
-    ;
+        .on('mousemove',function(){
+            var xy = d3.mouse(plot.node());
 
+            var tooltip = d3.select('.custom-tooltip');
+
+            tooltip
+                .style('left',(xy[0]+10)+'px')
+                .style('top',(xy[1]+10)+'px');
+        })
+        .on('mouseleave',function(){
+            d3.select('.custom-tooltip')
+                .transition()
+                .style('opacity',1);
+        })
 }*/
+
+
+
 
 function parse(d){
     return {
