@@ -27,6 +27,7 @@ var plot2 = d3.select('#plot-2')
 queue()
     .defer(d3.csv,'data/nobelPrizes.csv',parse)
     .defer(d3.csv,'data/nobelPeace.csv',parse)
+    .defer(d3.csv,'data/nobelPrizes_cleaned.csv',parse)
     .defer(d3.csv,'data/nobelPrizes_cleaned_separated.csv',parse)
     .await(dataLoaded);
 
@@ -113,6 +114,53 @@ var cValue = function(d){
 
 //draw first plot
     var series = plot
+        .data(country)
+        .append('g')
+        .attr('class','countries')
+
+    series.selectAll('country')
+        .data(d3.keys(nestedData1))
+        .enter()
+        .append('path')
+        .attr('d', function(d){
+            //console.log(d);
+            return lineGenerator(nestedData1[d].values)})
+        .attr('class','line')
+        .attr('transform', function(d,i){
+            return 'translate('+(i*5000)/width+ ','+(i*-4500)/height+')';
+        })
+        //.call(attachTooltip);
+        /*.on('mouseover',function(d){
+            console.log(d)
+            //value = shoud updare from the map and puts the name ;
+            div.transition()
+                .duration(10)
+                .style("opacity",.9)
+
+            div.html('<p>' + value + '</p>')
+                .style("left", (d3.event.pageX) + "px")
+                .style("top", (d3.event.pageY - 30) + "px");
+        })
+        .on("mouseout", function(d) {
+            div.transition()
+                .duration(400)
+                .style("opacity", 0)
+
+        })*/
+;
+
+
+    series.selectAll('country')
+        .data(d3.keys(nestedData1))
+        .enter()
+        .append('text')
+        .text(function(d){
+            return nestedData1[d].key})
+        .attr('x', 0)
+        .attr('y', 500)
+        .attr('transform', function(d,i){
+            return 'translate('+(i*5000)/width+ ','+(i*-4500)/height+')';
+        });    var series = plot
         .data(country)
         .append('g')
         .attr('class','countries')

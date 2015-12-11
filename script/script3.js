@@ -89,22 +89,6 @@ function dataLoaded(err,country,metadata) {
         .append('g')
         .attr('class', 'country');
 
-    /*var seriesText = plot.selectAll('.seriesText')
-        .data(d3.keys(nestedData))
-        .enter()
-        .append('g')
-        .text(function(d){
-            return d.ctry})
-        .attr('class', 'seriesText');*/
-
-
-        //.attr('transform', function(d,i){return height/58, i
-            //don't forget the accessor functions have a second parameter "i",
-            // which is the index (starting from 0) of the element in the selection
-
-            //you can use the second parameter "i" to incrementally "shift"
-            // the <g.series> groups by a fixed amount
-        //});
 
     var countryLines = series.selectAll('.line')
         .data(d3.keys(nestedData))

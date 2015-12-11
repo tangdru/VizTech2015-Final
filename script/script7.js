@@ -22,7 +22,7 @@ var plot2 = d3.select('#plot-2')
 
 //Import
 queue()
-    .defer(d3.csv,'data/nobelPrizes.csv',parse)
+    .defer(d3.csv,'data/nobelPrizes_cleaned.csv',parse)
     .defer(d3.csv,'data/metadataHemisphere.csv',parseMetadata)
     .await(dataLoaded);
 
@@ -30,19 +30,12 @@ queue()
 //Generator
 var lineGenerator = d3.svg.line()
     .x(function(d){ return scaleX(d.yr)})
-    .y(function(d){ return scaleY(d.mdlcnt*1.5)})
-    //.y(function(d){ return scaleY([d.mdlcnt]!='..'?+[d]:0)})
-
-    //.y(function(d){return scaleY(function(d)return d.yr;})
-    // .rollup d3.sum(d, function(g){return g.values;});
+    .y(function(d){ return scaleY(1)})
     .interpolate('bundle');
 
 
-
-
-
 //Scales
-var scaleX = d3.scale.linear().domain([1880,2015]).range([0,width *.6]),
+var scaleX = d3.scale.linear().domain([1901,2015]).range([0,width *.6]),
     scaleY = d3.scale.linear().domain([0,100]).range([height,0]);
 
 
@@ -52,7 +45,18 @@ function dataLoaded(err,country,metadata) {
         .key(function (d) {
             return d.ctry
         })
+        .key(function(d){
+            return d.yr
+        })
+        .rollup(function(leaves){
+            return {
+                prizes:leaves,
+                total:leaves.length
+            }
+        })
         .entries(country);
+
+    console.log(nestedData);
 
 
     /*nestedData.forEach(function (each) {
@@ -60,53 +64,19 @@ function dataLoaded(err,country,metadata) {
      each.total_count = count;
      })*/
 
-    console.log(nestedData);
-
-
-
     /*var filterPeace = nestedData.map(function(eachCountry){ //pass this through a function that will filter by 'what i want'
      return eachCountry.values.filter(function(d) {
      return d.prize == 'Peace';})
      }
      )*/
-    var filterPeace = nestedData.map(function(eachCountry){
+    /*var filterPeace = nestedData.map(function(eachCountry){
             return {
                 key:eachCountry.key,
                 values:eachCountry.values.filter(function(d) {return d.prize == 'Peace';})
             }
         }
     )
-    console.log("Peace", filterPeace);
-
-    /*var nodes = plot.selectAll('.countryLines')
-        .datum(d3.keys(nestedData))
-
-    var nodesEnter = nodes.enter().append('g')
-        .attr('class','countryLines')
-        .attr('d', lineGenerator);
-
-    nodesEnter.append('path')
-        .attr('class','line')
-        .attr('d', function(d){
-            return lineGenerator(nestedData[d].values)})
-        .attr('transform', function(d,i){
-            return 'translate('+(i*5000)/width+ ','+(i*-4000)/height+')';
-        })
-
-    nodesEnter.append('text')
-        .append('text')
-        .text(function(d){
-            return nestedData[d].key})
-        .attr('x', 0)
-        .attr('y', 480)
-        .attr('transform', function(d,i){
-            return 'translate('+(i*5000)/width+ ','+(i*-4000)/height+')';
-        })
-
-    nodes.exit()
-        .remove();*/
-
-
+    console.log("Peace", filterPeace);*/
 
 
     plot.selectAll('.countryLines')
@@ -126,7 +96,7 @@ function dataLoaded(err,country,metadata) {
         .attr('d', function(d){
             return lineGenerator(nestedData[d].values)})
         .attr('transform', function(d,i){
-            return 'translate('+(i*5000)/width+ ','+(i*-4000)/height+')';
+            return 'translate('+(i*5000)/width+ ','+(i*-4500)/height+')';
         })
 
     lines.exit()
@@ -140,12 +110,10 @@ function dataLoaded(err,country,metadata) {
         .text(function(d){
             return nestedData[d].key})
         .attr('x', 0)
-        .attr('y', 480)
+        .attr('y', 500)
         .attr('transform', function(d,i){
-            return 'translate('+(i*5000)/width+ ','+(i*-4000)/height+')';
+            return 'translate('+(i*5000)/width+ ','+(i*-4500)/height+')';
         })
-        .attachTooltip();
-
 
     names.exit()
         .transition()
@@ -157,14 +125,10 @@ function dataLoaded(err,country,metadata) {
 
 function parse(d){
     return {
-        yr:d['year']!='..'?d['year']:undefined,
-        prize: d['prize']!='..'?d['prize']:undefined,
+        yr:+d['year']!='..'?+d['year']:undefined,
         ctry: d['country']!='..'?d['country']:undefined,
-        gdr: d['gender']!='..'?d['gender']:undefined,
-        mdlcnt:+d['medalCount']!='..'?+d['medalCount']:0,
-        nameFirst:d['firstName']!='..'?d['firstName']:undefined,
-        nameLast:d['lastName']!='..'?d['lastName']:undefined,
-        afltn: d['affilation']!='..'?d['affilation']:undefined,
+        prizeName: d['prize']!='..'?d['prize']:undefined,
+        name:d['name']!='..'?d['name']:undefined
     }
 }
 
