@@ -69,14 +69,13 @@ var yValue = function(d){
         return yScale(yValue(d));},
     yAxis = d3.svg.axis().scale(yScale).orient('left');
 
-var cValue = function(d){
-        return d.prize;},
-    color = d3.scale.category10();
-
 var tooltip = d3.select("body").append("div")
     .attr("class", "tooltip")
     .style("opacity", 0);*/
 
+var cValue = function(d){
+        return d.prize;},
+    color = d3.scale.category10();
 //load data
     function dataLoaded(err,country,peace,cleaned) {
 
@@ -178,16 +177,86 @@ var tooltip = d3.select("body").append("div")
 
 //draw 2nd plot
 
-        plot2.selectAll('dots')
+        var chem = plot2
+            .data(cleaned)
+            .append('g')
+            .attr('class','countries')
+
+        chem.selectAll('country')
             .data(cleaned)
             .enter()
             .append('circle')
             .attr('cx', function(d){
-                return nestedData2[d].yr})
-            .attr('cy', function (d){
-                return d.prize})
+                return scaleX2(d.yr);})
+            .attr('cy',function(d){
+                return scaleY(d.chem);
+            })
+            .style('r',3)
+            .style('fill', 'red')
+            .style('opacity',.25)
+            .attr('transform', function(d,i){
+                return 'translate('+(i*0)+','+(i*-500)/height+')';
+            })
+
+        ;
+
+        var econ = plot2
+            .data(cleaned)
+            .append('g')
+            .attr('class','countries')
+        console.log(econ);
+
+        econ.selectAll('country')
+            .data(cleaned)
+            .enter()
+            .append('circle')
+            .attr('cx', function(d){
+                return scaleX2(d.yr);})
+            .attr('cy',function(d){
+                return scaleY(d.econ);
+            })
+            .style('r',3)
+            .style('fill', 'blue')
+            .style('opacity',.25)
+            .attr('transform', function(d,i){
+                return 'translate('+(i*0)+','+(i*-500)/height+')';
+            })
+
+        ;
+        var lit = plot2
+            .data(cleaned)
+            .append('g')
+            .attr('class','countries')
+
+        lit.selectAll('country')
+            .data(cleaned)
+            .enter()
+            .append('circle')
+            .attr('cx', function(d){
+                return scaleX2(d.yr);})
+            .attr('cy',function(d){
+                return scaleY(d.econ);
+            })
+            .style('r',3)
+            .style('fill', 'green')
+            .style('opacity',.25)
+            .attr('transform', function(d,i){
+                return 'translate('+(i*0)+','+(i*-500)/height+')';
+            })
+
+        ;
+
+
+        /*plot2.selectAll('dots')
+            .data(cleaned)
+            .enter()
+            .append('circle')
+            .attr('cx', function(d){
+                return d.yr})
+            .attr('cy', function (d,i){
+                return d.country})
             .attr('r', 4)
-            .attr('fill', 'black');
+            .attr('fill', 'black');*/
 
         /*plot2.append("g")
             .attr("class", "x axis")
@@ -286,7 +355,8 @@ var tooltip = d3.select("body").append("div")
 function parse(d){
     return {
         yr:+d['year']!='..'?+d['year']:undefined,
-        prize: d['prize']!='..'?d['prize']:undefined,
+        prize: +d['prize']!='..'?+d['prize']:undefined,
+        prizecnt: +d['prize']!='..'?d['prize']:undefined,
         ctry: d['country']!='..'?d['country']:undefined,
         gdr: d['gender']!='..'?d['gender']:undefined,
         mdlcnt:+d['medalCount']!='..'?+d['medalCount']:0,
@@ -294,6 +364,9 @@ function parse(d){
         nameLast:d['lastName']!='..'?d['lastName']:undefined,
         name:d['name']!='..'?d['name']:undefined,
         afltn: d['affilation']!='..'?d['affilation']:undefined,
+        chem: +d['chem']!='..'?d['chem']:undefined,
+        econ: +d['econ']!='..'?d['econ']:undefined,
+        lit: +d['lit']!='..'?d['lit']:undefined
     }
 }
 
