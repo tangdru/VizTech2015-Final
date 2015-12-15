@@ -99,6 +99,8 @@ function dataLoaded(err,country,metadata) {
             return 'translate('+(i*5000)/width+ ','+(i*-4500)/height+')';
         })
 
+
+
     lines.exit()
         .transition()
         .remove();

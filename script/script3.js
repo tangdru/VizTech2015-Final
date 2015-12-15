@@ -103,11 +103,11 @@ function dataLoaded(err,country,metadata) {
         });
 
         series.selectAll('text')
-            .data(d3.keys(nestedData))
+            .data(nestedData)
             .enter()
             .append('text')
             .text(function(d){
-                return d.data.ctry});
+                return d.ctry});
 
 
 

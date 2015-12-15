@@ -26,7 +26,6 @@ var plot2 = d3.select('#plot-2')
 //Import
 queue()
     .defer(d3.csv,'data/nobelPrizes.csv',parse)
-    .defer(d3.csv,'data/nobelPeace.csv',parse)
     .defer(d3.csv,'data/nobelPrizes_cleaned.csv',parse)
     .defer(d3.csv,'data/nobelPrizes_cleaned_separated.csv',parse)
     .await(dataLoaded);
