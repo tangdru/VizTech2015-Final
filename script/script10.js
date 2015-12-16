@@ -189,12 +189,21 @@ function dataLoaded(err,dataset) {
         .entries(filterPhysics);
     //console.log(nestedData7);
 
+    //buttons
+
+    d3.selectAll('.btn-group .category').on('click',function(){
+        var category = d3.select(this).attr('id');
+
+
+    })
+
 
 
     //draw country lines
     var ctryLines = plot.selectAll('.country')
         .data(nestedData1,function(d){return d.key})
-        .enter()
+
+        ctryLines.enter()
         .append('path')
         .attr('class','country') //this results in 57 <path> elements
         .each(function(d){
@@ -205,14 +214,22 @@ function dataLoaded(err,dataset) {
 
 
     ctryLines.attr('d', function(d,i){
+        //"this" --> the individual <path> elements
+        //"d" --> data object bound to the <path>
+        //d.values --> array of years and prizes, by country
+        //"i" --> index; use this to offset the <path>
         var prizes = d3.map(d.values, function(d){return d.key});
 
         lineGenerator
             .x(function(el){
+                //!!!!!!!!!!!!!!!Here is the important part!!!!!!!!!!!
+                //el --> a number, ranging from 1900 to 2015
                 return scaleX(el)
             })
 
             .y(function(el){
+                //again, el --> a number ranging from 1900 to 2015
+                //we use that number to look up the corresponding prizes for that year, if any
                 if(!prizes.get(el)) return 0;
                 return (prizes.get(el)).values.total*-5 ;
             })
@@ -220,6 +237,11 @@ function dataLoaded(err,dataset) {
         return lineGenerator(years);
 
     })
+
+    ctryLines.exit()
+        .transition()
+        .remove();
+
 
 
 }
