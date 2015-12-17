@@ -4,44 +4,67 @@
 var margin = {t:50,r:50,b:50,l:50};
 var width = document.getElementById('plot').clientWidth - margin.r - margin.l,
     height = document.getElementById('plot').clientHeight - margin.t - margin.b;
+console.log(height)
 
 var plot = d3.select('#plot')
     .append('svg')
-    .attr('width',width+margin.r+margin.l)
+    .attr('class','canvas').attr('width',width+margin.r+margin.l)
     .attr('height',height + margin.t + margin.b)
-    .append('g')
-    .attr('class','canvas')
     .attr('transform','translate('+margin.l+','+margin.t+')');
 
-//second plot
-/*var plot2 = d3.select('#plot-2')
-    .append('svg')
-    .attr('width',width+margin.r+margin.l)
-    .attr('height',height + margin.t + margin.b)
-    .append('g')
-    .attr('class','canvas')
-    .attr('transform','translate('+margin.l+','+margin.t+')');*/
 
+var allData = [];
+
+//buttons
+var whatToPlot =d3.map();
+whatToPlot.set('current_whatToPlot', ['nestedData1']);
+whatToPlot_init = whatToPlot.get('current_whatToPlot');
+
+d3.selectAll('.dataset_switch').on('click', function () {
+    var dataToPlot = d3.select(this).attr('id');
+    if (dataToPlot == "nestedData1") {
+        whatToPlot.set('current_whatToPlot', ['nestedData1']);
+        draw('nestedData1');
+    }
+    if (dataToPlot == "nestedData2") {
+        whatToPlot.set('current_whatToPlot', ['nestedData2']);
+        draw('nestedData2');
+    }
+    if (dataToPlot == "nestedData3") {
+        whatToPlot.set('current_whatToPlot', ['nestedData3']);
+        draw('nestedData3');
+    }
+    if (dataToPlot == "nestedData4") {
+        whatToPlot.set('current_whatToPlot', ['nestedData4']);
+        draw('nestedData4');
+    }
+    if (dataToPlot == "nestedData5") {
+        whatToPlot.set('current_whatToPlot', ['nestedData5']);
+        draw('nestedData5');
+    }
+    if (dataToPlot == "nestedData6") {
+        whatToPlot.set('current_whatToPlot', ['nestedData6']);
+        draw('nestedData6');
+    }
+    if (dataToPlot == "nestedData7") {
+        whatToPlot.set('current_whatToPlot', ['nestedData7']);
+        draw('nestedData7');
+    }
+});
 
 
 
 //Import
-queue()
-    .defer(d3.csv,'data/nobelPrizes_cleaned.csv',parseCountry)
-    .await(dataLoaded);
+function forQueue(){
+    queue()
+        .defer(d3.csv, 'data/nobelPrizes_cleaned.csv', parseCountry)
+        .await(dataLoaded);
+}
+forQueue();
 
 
 
 function dataLoaded(err,dataset) {
-    //console.log(dataset);
-
-    var scaleX = d3.scale.linear().domain([1900,2015]).range([0,width*.6]),
-        scaleY = d3.scale.linear().domain([0,100]).range([height,0]);
-    var lineGenerator = d3.svg.line()
-        .interpolate('basis');
-    var years = d3.range(1900,2016,1); //See: https://github.com/mbostock/d3/wiki/Arrays#d3_range
-    //console.log(years);
-
     //nest original data,
     var nestedData1 = d3.nest()
         .key(function (d) {
@@ -123,7 +146,7 @@ function dataLoaded(err,dataset) {
             }
         })
         .entries(filterLit);
-    //console.log(nestedData4);
+    console.log(nestedData4);
 
 
     //medicine data
@@ -150,7 +173,7 @@ function dataLoaded(err,dataset) {
 
     //peace data
     var filterPeace = dataset.filter(function(peace){
-            return peace.prizeName == 'Peace';
+        return peace.prizeName == 'Peace';
     })
     //console.log(filterPeace);
     var nestedData6 = d3.nest()
@@ -191,36 +214,52 @@ function dataLoaded(err,dataset) {
         .entries(filterPhysics);
     //console.log(nestedData7);
 
-    //buttons
-
-    d3.selectAll('.btn-group .category').on('click',function(){
-        var category = d3.select(this).attr('id');
-
-
+    allData.push({'nestedData1': nestedData1,'nestedData2': nestedData2,'nestedData3': nestedData3,'nestedData4': nestedData4,
+        'nestedData5': nestedData5,'nestedData6': nestedData6, 'nestedData7': nestedData7
     })
 
+    draw('nestedData1');
+}
+
+function draw(DataKey){
+
+    allDataEntries = d3.entries(allData[0]);
+    allDataEntriesMap = d3.map(allDataEntries, function(d) { return d.key; });
+    data = allDataEntriesMap.get(DataKey);
+
+    //var data = allData[DataKey];
+    var scaleX = d3.scale.linear().domain([1900,2015]).range([100,width*.8]),
+        scaleY = d3.scale.linear().domain([0,20]).range([height,0]);
+    var lineGenerator = d3.svg.line()
+        .interpolate('basis');
+    var years = d3.range(1900,2016,1); //See: https://github.com/mbostock/d3/wiki/Arrays#d3_range
+    //console.log(years);
 
 
     //draw country lines
-    var ctryLines = plot.selectAll('.country')
-        .data(nestedData1,function(d){return d.key})
+    var total_n = data.value.length
 
-        ctryLines.enter()
-        .append('path')
+    console.log(total_n)
+    console.log("data", data, allDataEntries)
+    var ctryLines = plot.selectAll('.country')
+        .data(data.value,function(d){return d.key});
+
+    var ctryLinesEnter = ctryLines.enter()
+        .append('g')
         .attr('class','country') //this results in 57 <path> elements
         .each(function(d){
-            //console.log(d); //just so you see what the data looks like
+            console.log(d); //just so you see what the data looks like
+            //d3.select(this)
         })
-        .style('fill','none')
-        .style('stroke','black');
 
 
-    ctryLines.attr('d', function(d,i){
-        //"this" --> the individual <path> elements
-        //"d" --> data object bound to the <path>
-        //d.values --> array of years and prizes, by country
-        //"i" --> index; use this to offset the <path>
+    ctryLinesEnter.append('path').attr('d', function(d,i){
         var prizes = d3.map(d.values, function(d){return d.key});
+
+        ctryLines.attr('transform', function(d,i){ //use map countryMeta to reference the i everytime so position doesn't change
+            return 'translate('+(i*width/total_n*300)/width+ ','+((height) - i*(height/total_n)/1.05)+')';
+        });
+
 
         lineGenerator
             .x(function(el){
@@ -240,25 +279,41 @@ function dataLoaded(err,dataset) {
 
     })
 
-    ctryLines.exit()
+    ctryLinesEnter.append('text').text(function(d){return d.key;})
+
+    var ctryLinesExit = ctryLines.exit()
         .transition()
         .remove();
 
-    ctryLines.selectAll('country')
-        .data(nestedData1,function(d){return d.key})
-        .enter()
-        .append('text')
-        .attr('class','country')
-        .text(function(d){
-            return d.ctry
-        });
+
+
+    ctryLines.select('path').attr('d', function(d,i){
+        var prizes = d3.map(d.values, function(d){return d.key});
+
+        lineGenerator
+            .x(function(el){
+                //!!!!!!!!!!!!!!!Here is the important part!!!!!!!!!!!
+                //el --> a number, ranging from 1900 to 2015
+                return scaleX(el)
+            })
+
+            .y(function(el){
+                //again, el --> a number ranging from 1900 to 2015
+                //we use that number to look up the corresponding prizes for that year, if any
+                if(!prizes.get(el)) return 0;
+                return (prizes.get(el)).values.total*-5 ;
+            })
+
+        return lineGenerator(years);
+
+    })
+    //ctryLines.attr('transform', function(d,i){
+    //    return 'translate('+(i*width/total_n*300)/width+ ','+((height) - i*(height/total_n) /1.05)+')';
+    //});
 
 
 
 }
-
-
-
 
 
 function parseCountry(d){return {
@@ -266,6 +321,6 @@ function parseCountry(d){return {
     ctry: d['country']!='..'?d['country']:undefined,
     prizeName: d['prize']!='..'?d['prize']:undefined,
     name:d['name']!='..'?d['name']:undefined
-    }
+}
 }
 
