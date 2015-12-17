@@ -221,6 +221,7 @@ function dataLoaded(err,dataset) {
     draw('nestedData1');
 }
 
+//draw
 function draw(DataKey){
 
     allDataEntries = d3.entries(allData[0]);
@@ -251,7 +252,6 @@ function draw(DataKey){
             console.log(d); //just so you see what the data looks like
             //d3.select(this)
         })
-
 
     ctryLinesEnter.append('path').attr('d', function(d,i){
         var prizes = d3.map(d.values, function(d){return d.key});
@@ -307,6 +307,15 @@ function draw(DataKey){
         return lineGenerator(years);
 
     })
+
+    .on("mouseover", function(d) {
+        d3.select(this).attr("r", 10).style("stroke", "red");
+    })
+    .on("mouseout", function(d) {
+        d3.select(this).attr("r", 5.5).style("stroke", "black");
+    });
+
+
     //ctryLines.attr('transform', function(d,i){
     //    return 'translate('+(i*width/total_n*300)/width+ ','+((height) - i*(height/total_n) /1.05)+')';
     //});
