@@ -1,10 +1,13 @@
 /**
  * Created by tangdru on 12/15/15.
  */
+
+
+
 var margin = {t:50,r:50,b:50,l:50};
 var width = document.getElementById('plot').clientWidth - margin.r - margin.l,
     height = document.getElementById('plot').clientHeight - margin.t - margin.b;
-console.log(height)
+//console.log(height)
 
 var plot = d3.select('#plot')
     .append('svg')
@@ -52,6 +55,9 @@ d3.selectAll('.dataset_switch').on('click', function () {
     }
 });
 
+//var div = d3.select("plot").append("div")
+//    .attr("class", "tooltip")
+//    .style("opacity", 0);
 
 
 //Import
@@ -62,7 +68,7 @@ function forQueue(){
 }
 forQueue();
 
-
+var name = "cant get passed key in nestedData"
 
 function dataLoaded(err,dataset) {
     //nest original data,
@@ -146,7 +152,7 @@ function dataLoaded(err,dataset) {
             }
         })
         .entries(filterLit);
-    console.log(nestedData4);
+    //console.log(nestedData4);
 
 
     //medicine data
@@ -228,6 +234,11 @@ function draw(DataKey){
     allDataEntriesMap = d3.map(allDataEntries, function(d) { return d.key; });
     data = allDataEntriesMap.get(DataKey);
 
+    //tooltip
+    var div = d3.select("body").append("div")
+        .attr("class", "tooltip")
+        .style("opacity", 0);
+
     //var data = allData[DataKey];
     var scaleX = d3.scale.linear().domain([1900,2015]).range([100,width*.8]),
         scaleY = d3.scale.linear().domain([0,20]).range([height,0]);
@@ -236,28 +247,29 @@ function draw(DataKey){
     var years = d3.range(1900,2016,1); //See: https://github.com/mbostock/d3/wiki/Arrays#d3_range
     //console.log(years);
 
-
     //draw country lines
     var total_n = data.value.length
 
-    console.log(total_n)
-    console.log("data", data, allDataEntries)
+    //console.log(total_n)
+    //console.log("data", data, allDataEntries)
     var ctryLines = plot.selectAll('.country')
-        .data(data.value,function(d){return d.key});
+        .data(data.value,function (d){return d.key});  //can't get object constancy to work
 
     var ctryLinesEnter = ctryLines.enter()
         .append('g')
         .attr('class','country') //this results in 57 <path> elements
         .each(function(d){
-            console.log(d); //just so you see what the data looks like
+            //console.log(d); //just so you see what the data looks like
             //d3.select(this)
         })
+        //.call(attachTooltip)
+
 
     ctryLinesEnter.append('path').attr('d', function(d,i){
         var prizes = d3.map(d.values, function(d){return d.key});
 
         ctryLines.attr('transform', function(d,i){ //use map countryMeta to reference the i everytime so position doesn't change
-            return 'translate('+(i*width/total_n*300)/width+ ','+((height) - i*(height/total_n)/1.05)+')';
+            return 'translate('+(i*width/total_n*270)/width+ ','+((height) - i*(height/total_n)/1.05)+')';
         });
 
 
@@ -279,10 +291,12 @@ function draw(DataKey){
 
     })
 
-    ctryLinesEnter.append('text').text(function(d){return d.key;})
+    ctryLinesEnter.append('text')
+        .text(function(d){return d.key;})
 
     var ctryLinesExit = ctryLines.exit()
-        .transition()
+        .transition().duration(150)
+        .style("opacity", .20)
         .remove();
 
 
@@ -307,18 +321,23 @@ function draw(DataKey){
         return lineGenerator(years);
 
     })
+    //tried all the tooltips you showed in class,
+    // but still couldn't get them to work, I can't access in information in the nest.
+     .on('mouseover',function(d){
+                console.log(d)
+                div.transition()
+                    .duration(10)
+                    .style("opacity",.9)
+                div .html(d.key+ ", " + name)
+                    .style("left", (d3.event.pageX) + "px")
+                    .style("top", (d3.event.pageY - 30) + "px");
+            })
+                .on("mouseout", function(d) {
+                    div.transition()
+                        .duration(400)
+                        .style("opacity", 0);
 
-    .on("mouseover", function(d) {
-        d3.select(this).attr("r", 10).style("stroke", "red");
-    })
-    .on("mouseout", function(d) {
-        d3.select(this).attr("r", 5.5).style("stroke", "black");
-    });
-
-
-    //ctryLines.attr('transform', function(d,i){
-    //    return 'translate('+(i*width/total_n*300)/width+ ','+((height) - i*(height/total_n) /1.05)+')';
-    //});
+                });
 
 
 

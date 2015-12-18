@@ -41,7 +41,7 @@ var lineGenerator = d3.svg.line()
 
 
 //Scales
-var scaleX = d3.scale.linear().domain([1900,2015]).range([0,width*.6]),
+var scaleX = d3.scale.linear().domain([1900,2015]).range([0,width*.7]),
     scaleY = d3.scale.linear().domain([0,100]).range([height,0]);
 
 
